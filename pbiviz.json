@@ -1,0 +1,27 @@
+{
+    "visual": {
+        "name": "barChart",
+        "displayName": "BarChart",
+        "guid": "barChart52039DF069A948F7B9D86259203543AF",
+        "visualClassName": "Visual",
+        "version": "1.0.0",
+        "description": "n/a",
+        "supportUrl": "n/a",
+        "gitHubUrl": "n/a"
+    },
+    "apiVersion": "2.6.0",
+    "author": {
+        "name": "Silas Hallahan",
+        "email": "silasishallahan@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": [
+        "node_modules/d3/d3.min.js"
+    ],
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": []
+}

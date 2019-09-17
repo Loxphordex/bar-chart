@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "author": {"name":"Silas Hallahan","email":"silasishallahan@gmail.com"},
+    "resources": [
+        {
+            "resourceId": "rId0",
+            "sourceType": 5,
+            "file": "resources/barChart52039DF069A948F7B9D86259203543AF.pbiviz.json"
+        }
+    ],
+    "visual": {"name":"barChart","displayName":"BarChart","guid":"barChart52039DF069A948F7B9D86259203543AF","visualClassName":"Visual","version":"1.0.0","description":"n/a","supportUrl":"n/a","gitHubUrl":"n/a"},
+    "metadata": {
+        "pbivizjson": {
+            "resourceId": "rId0"
+        }
+    }  
+}
