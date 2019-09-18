@@ -55,9 +55,10 @@ interface ViewModel {
 export class Visual implements IVisual {
     private target: HTMLElement;
     private updateCount: number;
-    //private settings: VisualSettings;
+    private viewModel: ViewModel;
     private textNode: Text;
     private host: IVisualHost;
+    private locale: string;
     private svg: Selection<SVGElement>;
     private barGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
@@ -66,12 +67,17 @@ export class Visual implements IVisual {
         axis: {
             x: {
                 padding: 50
+            },
+
+            y: {
+                padding: 50
             }
         }
     };
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
+        this.locale = this.host.locale;
         this.svg = d3.select(options.element)
             .append('svg')
             .classed('bar-chart', true);
@@ -83,7 +89,7 @@ export class Visual implements IVisual {
 
     public update(options: VisualUpdateOptions) {
 
-        let viewModel = this.getViewModel(options);
+        this.viewModel = this.getViewModel(options);
 
         let width: number = options.viewport.width;
         let height: number = options.viewport.height;
@@ -92,35 +98,58 @@ export class Visual implements IVisual {
         this.svg.attr('height', height);
 
         let yScale = d3.scaleLinear()
-            .domain([0, viewModel.maxValue])
+            .domain([0, this.viewModel.maxValue])
             .range([height - this.settings.axis.x.padding, 0]);
 
         let xScale = d3.scaleBand()
-            .domain(viewModel.dataPoints.map(data => data.category))
-            .rangeRound([0, width])
+            .domain(this.viewModel.dataPoints.map(data => data.category))
+            .range([0, width])
             .padding(this.xPadding);
 
         let xAxis = d3.axisBottom(xScale)
             .scale(xScale)
             .tickSize(1);
 
-        this.xAxisGroup.call(xAxis);
+        this.xAxisGroup
+            .call(xAxis)
+            .attr('transform', `translate(0, ${height - this.settings.axis.x.padding})`);
 
-        let bars = this.barGroup;
+        let band = xScale.bandwidth();
+        console.log(band);
 
-        bars.selectAll('.bar')
-            .data(viewModel.dataPoints)
-            .enter()
+
+        let bars = this.barGroup
+            .selectAll('.bar')
+            .data(this.viewModel.dataPoints);
+
+        bars.enter()
             .append('rect')
             .classed('bar', true)
-            .attr('width', xScale.bandwidth())
+            .attr('width', band)
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
-            .attr('x', (d) => xScale(d.category))
+            .attr('x', (d, i) => {
+                return xScale(d.category);
+            })
             .attr('y', (d) => yScale(d.value))
             .style('fill', 'blue');
 
-        bars.exit()
-            .remove();
+        bars
+            .attr('width', band)
+            .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
+            .attr('x', (d, i) => {
+                return xScale(d.category);
+            })
+            .attr('y', (d) => yScale(d.value));
+
+        bars.exit().remove();
+
+        // bars.selectAll('text')
+        //     .data(this.viewModel.dataPoints)
+        //     .enter()
+        //     .append('text')
+        //     .text((d, i) => `${options.viewport.width}`)
+        //     .attr('x', (d, i) => i * 30)
+        //     .attr('y', (d, i) => height - (3 * d.value) - 3);
     }
 
     private getViewModel(options: VisualUpdateOptions): ViewModel {
@@ -135,8 +164,8 @@ export class Visual implements IVisual {
             || !dv[0].categorical.categories
             || !dv[0].categorical.categories[0].source
             || !dv[0].categorical.values) {
-                return viewModel;
-            }
+            return viewModel;
+        }
         let view = dv[0].categorical;
         let categories = view.categories[0];
         let values = view.values[0];
