@@ -61,6 +61,7 @@ export class Visual implements IVisual {
     private locale: string;
     private svg: Selection<SVGElement>;
     private barGroup: Selection<SVGElement>;
+    private labelGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
     private xAxisGroup: Selection<SVGElement>;
     private settings = {
@@ -83,6 +84,8 @@ export class Visual implements IVisual {
             .classed('bar-chart', true);
         this.barGroup = this.svg.append('g')
             .classed('bar-group', true);
+        this.labelGroup = this.svg.append('g')
+            .classed('label-group', true);
         this.xAxisGroup = this.svg.append('g')
             .classed('x-axis', true);
     }
@@ -99,11 +102,11 @@ export class Visual implements IVisual {
 
         let yScale = d3.scaleLinear()
             .domain([0, this.viewModel.maxValue])
-            .range([height - this.settings.axis.x.padding, 0]);
+            .range([height - this.settings.axis.x.padding, height * 0.2]);
 
         let xScale = d3.scaleBand()
-            .domain(this.viewModel.dataPoints.map(data => data.category))
-            .range([0, width])
+            .domain(this.viewModel.dataPoints.map(data => data.category).sort())
+            .rangeRound([0, width])
             .padding(this.xPadding);
 
         let xAxis = d3.axisBottom(xScale)
@@ -114,42 +117,49 @@ export class Visual implements IVisual {
             .call(xAxis)
             .attr('transform', `translate(0, ${height - this.settings.axis.x.padding})`);
 
-        let band = xScale.bandwidth();
-        console.log(band);
-
-
         let bars = this.barGroup
             .selectAll('.bar')
             .data(this.viewModel.dataPoints);
-
         bars.enter()
             .append('rect')
             .classed('bar', true)
-            .attr('width', band)
+            .attr('width', xScale.bandwidth())
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
-            .attr('x', (d, i) => {
-                return xScale(d.category);
-            })
+            .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value))
             .style('fill', 'blue');
-
         bars
-            .attr('width', band)
+            .attr('width', xScale.bandwidth())
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
             .attr('x', (d, i) => {
                 return xScale(d.category);
             })
             .attr('y', (d) => yScale(d.value));
-
         bars.exit().remove();
 
-        // bars.selectAll('text')
-        //     .data(this.viewModel.dataPoints)
-        //     .enter()
-        //     .append('text')
-        //     .text((d, i) => `${options.viewport.width}`)
-        //     .attr('x', (d, i) => i * 30)
-        //     .attr('y', (d, i) => height - (3 * d.value) - 3);
+        let labels = this.labelGroup
+            .selectAll('text')
+            .data(this.viewModel.dataPoints);
+        labels.enter()
+            .append('text')
+            .text((d) => {
+                // finds the difference between the initial data value and the current data value
+                // then the difference is converted to a string
+                let diffFromMax = ((d.value / this.viewModel.dataPoints[0].value) * 100).toString();
+                if (diffFromMax !== '100') {
+                    diffFromMax = diffFromMax.slice(0, 2);
+                }
+                else {
+                    diffFromMax = diffFromMax.slice(0, 3);
+                }
+                return `%${diffFromMax}`;
+            })
+            .attr('x', (d) => xScale(d.category))
+            .attr('y', (d) => yScale(d.value));
+        labels
+            .attr('x', (d) => xScale(d.category))
+            .attr('y', (d) => yScale(d.value));
+        labels.exit().remove();
     }
 
     private getViewModel(options: VisualUpdateOptions): ViewModel {
