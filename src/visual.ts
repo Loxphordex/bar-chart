@@ -62,6 +62,7 @@ export class Visual implements IVisual {
     private svg: Selection<SVGElement>;
     private barGroup: Selection<SVGElement>;
     private labelGroup: Selection<SVGElement>;
+    private dLabelGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
     private xAxisGroup: Selection<SVGElement>;
     private settings = {
@@ -86,12 +87,17 @@ export class Visual implements IVisual {
             .classed('bar-group', true);
         this.labelGroup = this.svg.append('g')
             .classed('label-group', true);
+        this.dLabelGroup = this.svg.append('g')
+            .classed('d-label-group', true);
         this.xAxisGroup = this.svg.append('g')
             .classed('x-axis', true);
     }
 
     public update(options: VisualUpdateOptions) {
 
+        //
+        // VIEW SETUP
+        //
         this.viewModel = this.getViewModel(options);
 
         let width: number = options.viewport.width;
@@ -117,6 +123,9 @@ export class Visual implements IVisual {
             .call(xAxis)
             .attr('transform', `translate(0, ${height - this.settings.axis.x.padding})`);
 
+        //
+        // BARS
+        //
         let bars = this.barGroup
             .selectAll('.bar')
             .data(this.viewModel.dataPoints);
@@ -131,14 +140,15 @@ export class Visual implements IVisual {
         bars
             .attr('width', xScale.bandwidth())
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
-            .attr('x', (d, i) => {
-                return xScale(d.category);
-            })
+            .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value));
         bars.exit().remove();
 
+        //
+        // lABELS - PERCENTAGE
+        //
         let labels = this.labelGroup
-            .selectAll('text')
+            .selectAll('.v-label')
             .data(this.viewModel.dataPoints);
         labels.enter()
             .append('text')
@@ -156,7 +166,7 @@ export class Visual implements IVisual {
                 else {
                     diffFromMax = diffFromMax.slice(0, 3);
                 }
-                return `%${diffFromMax}`;
+                return `${diffFromMax}%`;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
@@ -166,6 +176,33 @@ export class Visual implements IVisual {
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
             .attr("text-anchor", "middle");
         labels.exit().remove();
+
+        //
+        // LABELS - DATA
+        //
+        let dLabels = this.dLabelGroup
+            .selectAll('.d-label')
+            .data(this.viewModel.dataPoints);
+        dLabels.enter()
+            .append('text')
+            .classed('d-label', true)
+            .text((d) => {
+                let dPoint = d.value.toString();
+                dPoint.split('').map((char, i) => {
+                    if (char === '.') {
+                        dPoint = dPoint.slice(0, i);
+                    }
+                });
+                return `${dPoint}M`;
+            })
+            .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
+            .attr('y', (d) => yScale(d.value) - (height * 0.05))
+            .attr("text-anchor", "middle");
+        dLabels
+            .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
+            .attr('y', (d) => yScale(d.value) - (height * 0.05))
+            .attr("text-anchor", "middle");
+        dLabels.exit().remove();
     }
 
     private getViewModel(options: VisualUpdateOptions): ViewModel {
