@@ -142,6 +142,7 @@ export class Visual implements IVisual {
             .data(this.viewModel.dataPoints);
         labels.enter()
             .append('text')
+            .classed('v-label', true)
             .text((d) => {
                 // finds the difference between the initial data value and the current data value
                 // then the difference is converted to a string
@@ -149,16 +150,21 @@ export class Visual implements IVisual {
                 if (diffFromMax !== '100') {
                     diffFromMax = diffFromMax.slice(0, 2);
                 }
+                if (diffFromMax[1] === '.') {
+                    diffFromMax = diffFromMax.slice(0, 1);
+                }
                 else {
                     diffFromMax = diffFromMax.slice(0, 3);
                 }
                 return `%${diffFromMax}`;
             })
-            .attr('x', (d) => xScale(d.category))
-            .attr('y', (d) => yScale(d.value));
+            .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
+            .attr('y', (d) => yScale(d.value) - (height * 0.01))
+            .attr("text-anchor", "middle");
         labels
-            .attr('x', (d) => xScale(d.category))
-            .attr('y', (d) => yScale(d.value));
+            .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
+            .attr('y', (d) => yScale(d.value) - (height * 0.01))
+            .attr("text-anchor", "middle");
         labels.exit().remove();
     }
 
