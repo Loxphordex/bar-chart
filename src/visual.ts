@@ -55,12 +55,20 @@ interface ViewModel {
 export class Visual implements IVisual {
     private target: HTMLElement;
     private updateCount: number;
-    private settings: VisualSettings;
+    //private settings: VisualSettings;
     private textNode: Text;
     private host: IVisualHost;
     private svg: Selection<SVGElement>;
     private barGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
+    private xAxisGroup: Selection<SVGElement>;
+    private settings = {
+        axis: {
+            x: {
+                padding: 50
+            }
+        }
+    };
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -69,27 +77,34 @@ export class Visual implements IVisual {
             .classed('bar-chart', true);
         this.barGroup = this.svg.append('g')
             .classed('bar-group', true);
+        this.xAxisGroup = this.svg.append('g')
+            .classed('x-axis', true);
     }
 
     public update(options: VisualUpdateOptions) {
 
         let viewModel = this.getViewModel(options);
 
-        let width = options.viewport.width;
-        let height = options.viewport.height;
+        let width: number = options.viewport.width;
+        let height: number = options.viewport.height;
 
-        this.svg
-            .attr('width', width)
-            .attr('height', height);
+        this.svg.attr('width', width);
+        this.svg.attr('height', height);
 
         let yScale = d3.scaleLinear()
             .domain([0, viewModel.maxValue])
-            .range([height, 0]);
+            .range([height - this.settings.axis.x.padding, 0]);
 
         let xScale = d3.scaleBand()
             .domain(viewModel.dataPoints.map(data => data.category))
             .rangeRound([0, width])
             .padding(this.xPadding);
+
+        let xAxis = d3.axisBottom(xScale)
+            .scale(xScale)
+            .tickSize(1);
+
+        this.xAxisGroup.call(xAxis);
 
         let bars = this.barGroup;
 
@@ -99,7 +114,7 @@ export class Visual implements IVisual {
             .append('rect')
             .classed('bar', true)
             .attr('width', xScale.bandwidth())
-            .attr('height', (d) => height - yScale(d.value))
+            .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
             .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value))
             .style('fill', 'blue');
@@ -148,6 +163,6 @@ export class Visual implements IVisual {
      *
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-        return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+        return VisualSettings.enumerateObjectInstances(VisualSettings.getDefault(), options);
     }
 }
