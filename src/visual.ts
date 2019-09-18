@@ -180,7 +180,7 @@ export class Visual implements IVisual {
         //
         // LABELS - DATA
         //
-        let dLabels = this.dLabelGroup
+        let dLabels = this.labelGroup
             .selectAll('.d-label')
             .data(this.viewModel.dataPoints);
         dLabels.enter()
@@ -196,11 +196,11 @@ export class Visual implements IVisual {
                 return `${dPoint}M`;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - (height * 0.05))
+            .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle");
         dLabels
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - (height * 0.05))
+            .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle");
         dLabels.exit().remove();
     }
