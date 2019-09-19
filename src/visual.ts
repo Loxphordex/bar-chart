@@ -168,6 +168,7 @@ export class Visual implements IVisual {
             .style('fill', 'rgba(220, 0, 0, 0.623)')
             .style('position', 'relative')
             .style('display', (d, i) => {
+                // remove the last percentage bar
                 return (this.viewModel.dataPoints[i + 1])
                     ? 'block'
                     : 'none';
@@ -309,8 +310,6 @@ export class Visual implements IVisual {
             .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle");
         dLabels.exit().remove();
-
-
     }
 
     private getViewModel(options: VisualUpdateOptions): ViewModel {
