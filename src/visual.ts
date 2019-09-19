@@ -136,7 +136,7 @@ export class Visual implements IVisual {
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
             .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value))
-            .style('fill', 'blue');
+            .style('fill', 'rgb(57, 123, 180)');
         bars
             .attr('width', xScale.bandwidth())
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
@@ -170,7 +170,8 @@ export class Visual implements IVisual {
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
-            .attr("text-anchor", "middle");
+            .attr("text-anchor", "middle")
+            .style('font-size', '0.9em');
         labels
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
@@ -197,7 +198,9 @@ export class Visual implements IVisual {
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - 23)
-            .attr("text-anchor", "middle");
+            .attr("text-anchor", "middle")
+            .style('font-weight', '500')
+            .style('fill', 'rgb(57, 123, 180)');
         dLabels
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - 23)
