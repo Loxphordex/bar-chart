@@ -160,9 +160,9 @@ export class Visual implements IVisual {
             .append('rect')
             .classed('pbar', true)
             .attr('width', (xScale.bandwidth() / 4) + 20)
-            .attr('height', (d) => height * 0.055)
+            .attr('height', (d) => 30)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
-            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.065))
+            .attr('y', (d) => height - this.settings.axis.x.padding - 40)
             .attr('rx', 5)
             .attr('ry', 5)
             .style('fill', 'rgba(220, 0, 0, 0.623)')
@@ -174,9 +174,9 @@ export class Visual implements IVisual {
             });
         pBars
             .attr('width', (xScale.bandwidth() / 4) + 20)
-            .attr('height', (d) => height * 0.055)
+            .attr('height', (d) => 30)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
-            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.065))
+            .attr('y', (d) => height - this.settings.axis.x.padding - 40);
         pBars.exit().remove();
 
         //
@@ -209,9 +209,9 @@ export class Visual implements IVisual {
                 return '';
             })
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
-            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.027))
+            .attr('y', (d) => height - this.settings.axis.x.padding - 20)
             .style('position', 'absolute')
-            .style('font-size', (d) => `${height * 0.0015}rem`)
+            .style('font-size', '0.9em')
             .style('text-anchor', 'middle')
             .style('fill', 'white')
             .style('z-index', 100)
@@ -222,8 +222,7 @@ export class Visual implements IVisual {
             });
         pLabels
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
-            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.027))
-            .style('font-size', (d) => `${height * 0.0015}rem`);
+            .attr('y', (d) => height - this.settings.axis.x.padding - 20);
         pLabels.exit().remove();
 
 
@@ -295,6 +294,7 @@ export class Visual implements IVisual {
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle")
+            .style('font-size', '1.05em')
             .style('font-weight', '500')
             .style('fill', 'rgb(57, 123, 180)');
         dLabels
