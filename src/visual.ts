@@ -117,7 +117,7 @@ export class Visual implements IVisual {
             .range([height - this.settings.axis.x.padding, height * 0.2]);
 
         let xScale = d3.scaleBand()
-            .domain(this.viewModel.dataPoints.map(data => data.category).sort())
+            .domain(this.viewModel.dataPoints.map(data => data.category))
             .rangeRound([0, width])
             .padding(this.xPadding);
 
@@ -188,7 +188,24 @@ export class Visual implements IVisual {
             .append('text')
             .classed('plabel', true)
             .text((d, i) => {
-                return `${d.category[0]}`;
+                const data = this.viewModel.dataPoints;
+                if (data[i + 1]) {
+                    let diff: number;
+                    let pDiff: number;
+                    let trimmedDiff: string;
+
+                    if (data[i + 1].value < d.value) {
+                        diff = (data[i + 1].value / d.value) * 100;
+                        pDiff = 100 - diff;
+                        trimmedDiff = pDiff.toString().slice(0, 4);
+                        return `-${trimmedDiff}%`;
+                    }
+
+                    // if (data[i + 1].value > d.value) {
+                    //     diff = (d)
+                    // }
+                }
+                return '';
             })
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width * 0.008))
             .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.027))
