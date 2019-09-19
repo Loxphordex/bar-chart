@@ -277,7 +277,20 @@ export class Visual implements IVisual {
                         dPoint = dPoint.slice(0, i);
                     }
                 });
-                return `${dPoint}M`;
+                console.log(dPoint);
+                // unit assignment
+                if (dPoint.length < 4) return dPoint;
+                if (dPoint.length === 4) return `${dPoint}`;
+                if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}K`;
+                if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}K`;
+                if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}M`;
+                if (dPoint.length === 8) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}M`;
+                if (dPoint.length === 9) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}M`;
+                if (dPoint.length === 10) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}B`;
+                if (dPoint.length === 11) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}B`;
+                if (dPoint.length === 12) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}B`;
+                if (dPoint.length === 13) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}T`;
+                return dPoint;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - 23)
