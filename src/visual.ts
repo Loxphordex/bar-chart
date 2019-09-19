@@ -202,9 +202,16 @@ export class Visual implements IVisual {
                         return `-${trimmedDiff}%`;
                     }
 
-                    // if (data[i + 1].value > d.value) {
-                    //     diff = (d)
-                    // }
+                    if (data[i + 1].value > d.value) {
+                        diff = (d.value / data[i + 1].value);
+                        pDiff = 100 - diff;
+                        trimmedDiff = pDiff.toString().slice(0, 4);
+                        return `+${trimmedDiff}%`;
+                    }
+
+                    if (data[i + 1].value === d.value) return '+0.0%';
+
+
                 }
                 return '';
             })
