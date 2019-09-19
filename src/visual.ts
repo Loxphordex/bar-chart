@@ -64,6 +64,7 @@ export class Visual implements IVisual {
     private pBarGroup: Selection<SVGElement>;
     private labelGroup: Selection<SVGElement>;
     private dLabelGroup: Selection<SVGElement>;
+    private pLabelGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
     private xAxisGroup: Selection<SVGElement>;
     private settings = {
@@ -92,6 +93,8 @@ export class Visual implements IVisual {
             .classed('label-group', true);
         this.dLabelGroup = this.svg.append('g')
             .classed('d-label-group', true);
+        this.pLabelGroup = this.svg.append('g')
+            .classed('p-label-group', true);
         this.xAxisGroup = this.svg.append('g')
             .classed('x-axis', true);
     }
@@ -163,12 +166,47 @@ export class Visual implements IVisual {
             .attr('rx', 5)
             .attr('ry', 5)
             .style('fill', 'rgba(220, 0, 0, 0.623)')
-            .style('border-radius', '7%');
+            .style('position', 'relative')
+            .style('display', (d, i) => {
+                return (this.viewModel.dataPoints[i + 1])
+                    ? 'block'
+                    : 'none';
+            });
         pBars
             .attr('width', xScale.bandwidth() - (width * 0.02))
             .attr('height', (d) => height * 0.055)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() / (2 - this.xPadding) + (width * 0.015))
             .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.065));
+
+        //
+        // LABELS - DIFFERENCE IN PERCENTAGE
+        //
+        let pLabels = this.pLabelGroup
+            .selectAll('.plabel')
+            .data(this.viewModel.dataPoints);
+        pLabels.enter()
+            .append('text')
+            .classed('plabel', true)
+            .text((d, i) => {
+                return `${d.category[0]}`;
+            })
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width * 0.008))
+            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.027))
+            .style('position', 'absolute')
+            .style('font-size', (d) => `${height * 0.0016}rem`)
+            .style('text-anchor', 'middle')
+            .style('fill', 'white')
+            .style('z-index', 100)
+            .style('display', (d, i) => {
+                return (this.viewModel.dataPoints[i + 1])
+                    ? 'inline-block'
+                    : 'none';
+            });
+        pLabels
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width * 0.008))
+            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.027))
+            .style('font-size', (d) => `${height * 0.0016}rem`);
+
 
         //
         // lABELS - PERCENTAGE
@@ -232,6 +270,8 @@ export class Visual implements IVisual {
             .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle");
         dLabels.exit().remove();
+
+
     }
 
     private getViewModel(options: VisualUpdateOptions): ViewModel {
