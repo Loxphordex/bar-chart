@@ -61,6 +61,7 @@ export class Visual implements IVisual {
     private locale: string;
     private svg: Selection<SVGElement>;
     private barGroup: Selection<SVGElement>;
+    private pBarGroup: Selection<SVGElement>;
     private labelGroup: Selection<SVGElement>;
     private dLabelGroup: Selection<SVGElement>;
     private xPadding: number = 0.2;
@@ -85,6 +86,8 @@ export class Visual implements IVisual {
             .classed('bar-chart', true);
         this.barGroup = this.svg.append('g')
             .classed('bar-group', true);
+        this.pBarGroup = this.svg.append('g')
+            .classed('p-bar-group', true);
         this.labelGroup = this.svg.append('g')
             .classed('label-group', true);
         this.dLabelGroup = this.svg.append('g')
@@ -143,6 +146,29 @@ export class Visual implements IVisual {
             .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value));
         bars.exit().remove();
+
+        //
+        // BARS - PERCENTAGE
+        //
+        let pBars = this.pBarGroup
+            .selectAll('.pbar')
+            .data(this.viewModel.dataPoints);
+        pBars.enter()
+            .append('rect')
+            .classed('pbar', true)
+            .attr('width', xScale.bandwidth() - (width * 0.02))
+            .attr('height', (d) => height * 0.055)
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() / (2 - this.xPadding) + (width * 0.015))
+            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.065))
+            .attr('rx', 5)
+            .attr('ry', 5)
+            .style('fill', 'rgba(220, 0, 0, 0.623)')
+            .style('border-radius', '7%');
+        pBars
+            .attr('width', xScale.bandwidth() - (width * 0.02))
+            .attr('height', (d) => height * 0.055)
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() / (2 - this.xPadding) + (width * 0.015))
+            .attr('y', (d) => height - this.settings.axis.x.padding - (height * 0.065));
 
         //
         // lABELS - PERCENTAGE
