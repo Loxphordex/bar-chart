@@ -199,18 +199,18 @@ export class Visual implements IVisual {
                     if (data[i + 1].value < d.value) {
                         diff = (data[i + 1].value / d.value) * 100;
                         pDiff = 100 - diff;
-                        trimmedDiff = pDiff.toString().slice(0, 4);
+                        trimmedDiff = pDiff.toFixed(2).toString();
                         return `-${trimmedDiff}%`;
                     }
 
                     if (data[i + 1].value > d.value) {
                         diff = (d.value / data[i + 1].value);
                         pDiff = 100 - diff;
-                        trimmedDiff = pDiff.toString().slice(0, 4);
+                        trimmedDiff = pDiff.toFixed(2).toString();
                         return `+${trimmedDiff}%`;
                     }
 
-                    if (data[i + 1].value === d.value) return '+0.0%';
+                    if (data[i + 1].value === d.value) return '+0.00%';
 
 
                 }
@@ -219,7 +219,7 @@ export class Visual implements IVisual {
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
             .attr('y', (d) => height - this.settings.axis.x.padding - 20)
             .style('position', 'absolute')
-            .style('font-size', '0.9em')
+            .style('font-size', '0.85em')
             .style('text-anchor', 'middle')
             .style('fill', 'white')
             .style('z-index', 100)
@@ -246,17 +246,8 @@ export class Visual implements IVisual {
             .text((d) => {
                 // finds the difference between the initial data value and the current data value
                 // then the difference is converted to a string
-                let diffFromMax = ((d.value / this.viewModel.dataPoints[0].value) * 100).toString();
-                if (diffFromMax !== '100') {
-                    diffFromMax = diffFromMax.slice(0, 2);
-                }
-                if (diffFromMax[1] === '.') {
-                    diffFromMax = diffFromMax.slice(0, 1);
-                }
-                else {
-                    diffFromMax = diffFromMax.slice(0, 3);
-                }
-                return `${diffFromMax}%`;
+                let diffFromMax = ((d.value / this.viewModel.dataPoints[0].value) * 100);
+                return `${Math.round(diffFromMax)}%`;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
@@ -278,16 +269,11 @@ export class Visual implements IVisual {
             .append('text')
             .classed('d-label', true)
             .text((d) => {
-                let dPoint = d.value.toString();
-                dPoint.split('').map((char, i) => {
-                    if (char === '.') {
-                        dPoint = dPoint.slice(0, i);
-                    }
-                });
-                console.log(dPoint);
+                let dPoint = d.value.toFixed();
+
                 // unit assignment
                 if (dPoint.length < 4) return dPoint;
-                if (dPoint.length === 4) return `${dPoint}`;
+                if (dPoint.length === 4) return `${dPoint[0]},${dPoint.slice(1)}`;
                 if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}K`;
                 if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}K`;
                 if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}M`;
