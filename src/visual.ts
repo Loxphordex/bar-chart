@@ -199,18 +199,18 @@ export class Visual implements IVisual {
                     if (data[i + 1].value < d.value) {
                         diff = (data[i + 1].value / d.value) * 100;
                         pDiff = 100 - diff;
-                        trimmedDiff = Math.round(pDiff).toString();
+                        trimmedDiff = pDiff.toFixed(2).toString();
                         return `-${trimmedDiff}%`;
                     }
 
                     if (data[i + 1].value > d.value) {
                         diff = (d.value / data[i + 1].value);
                         pDiff = 100 - diff;
-                        trimmedDiff = Math.round(pDiff).toString();
+                        trimmedDiff = pDiff.toFixed(2).toString();
                         return `+${trimmedDiff}%`;
                     }
 
-                    if (data[i + 1].value === d.value) return '+00%';
+                    if (data[i + 1].value === d.value) return '+0.00%';
 
 
                 }
@@ -219,7 +219,7 @@ export class Visual implements IVisual {
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
             .attr('y', (d) => height - this.settings.axis.x.padding - 20)
             .style('position', 'absolute')
-            .style('font-size', '0.9em')
+            .style('font-size', '0.85em')
             .style('text-anchor', 'middle')
             .style('fill', 'white')
             .style('z-index', 100)
