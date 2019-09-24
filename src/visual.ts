@@ -45,7 +45,6 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 interface DataPoint {
     category: string;
     value: number;
-    order: number;
 }
 
 interface ViewModel {
@@ -118,7 +117,7 @@ export class Visual implements IVisual {
             .range([height - this.settings.axis.x.padding, height * 0.2]);
 
         let xScale = d3.scaleBand()
-            .domain(this.viewModel.dataPoints.map(data => data.category))
+            .domain(this.viewModel.dataPoints.map(data => data.category).sort())
             .rangeRound([0, width])
             .padding(this.xPadding);
 
@@ -193,22 +192,19 @@ export class Visual implements IVisual {
             .text((d, i) => {
                 const data = this.viewModel.dataPoints;
                 if (data[i + 1]) {
-                    let diff: number;
-                    let pDiff: number;
-                    let trimmedDiff: string;
+                    let d1 = d.value;
+                    let d2 = data[i + 1].value;
+                    let num = d2 - d1;
+                    let den = Math.abs(d1);
+                    let difference = (num / den) * 100;
+                    let formattedDif = difference.toFixed(2);
 
                     if (data[i + 1].value < d.value) {
-                        diff = (data[i + 1].value / d.value) * 100;
-                        pDiff = 100 - diff;
-                        trimmedDiff = pDiff.toFixed(2).toString();
-                        return `-${trimmedDiff}%`;
+                        return `-${formattedDif}%`;
                     }
 
                     if (data[i + 1].value > d.value) {
-                        diff = (d.value / data[i + 1].value);
-                        pDiff = 100 - diff;
-                        trimmedDiff = pDiff.toFixed(2).toString();
-                        return `+${trimmedDiff}%`;
+                        return `+${formattedDif}%`;
                     }
 
                     if (data[i + 1].value === d.value) return '+0.00%';
@@ -247,7 +243,8 @@ export class Visual implements IVisual {
             .text((d) => {
                 // finds the difference between the initial data value and the current data value
                 // then the difference is converted to a string
-                let diffFromMax = ((d.value / this.viewModel.dataPoints[0].value) * 100);
+                let max = d3.max(this.viewModel.dataPoints.map(data => data.value));
+                let diffFromMax = ((d.value / max) * 100);
                 return `${Math.round(diffFromMax)}%`;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
@@ -275,15 +272,15 @@ export class Visual implements IVisual {
                 // unit assignment
                 if (dPoint.length < 4) return dPoint;
                 if (dPoint.length === 4) return `${dPoint[0]},${dPoint.slice(1)}`;
-                if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}K`;
-                if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}K`;
-                if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}M`;
-                if (dPoint.length === 8) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}M`;
-                if (dPoint.length === 9) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}M`;
-                if (dPoint.length === 10) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}B`;
-                if (dPoint.length === 11) return `${dPoint.slice(0, 2)}.${dPoint.slice(3, 4)}B`;
-                if (dPoint.length === 12) return `${dPoint.slice(0, 3)}.${dPoint.slice(4, 5)}B`;
-                if (dPoint.length === 13) return `${dPoint.slice(0, 1)}.${dPoint.slice(2, 3)}T`;
+                if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}K`;
+                if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}K`;
+                if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}M`;
+                if (dPoint.length === 8) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}M`;
+                if (dPoint.length === 9) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}M`;
+                if (dPoint.length === 10) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}B`;
+                if (dPoint.length === 11) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}B`;
+                if (dPoint.length === 12) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}B`;
+                if (dPoint.length === 13) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}T`;
                 return dPoint;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
@@ -321,7 +318,6 @@ export class Visual implements IVisual {
             viewModel.dataPoints.push({
                 category: <string>categories.values[i],
                 value: <number>values.values[i],
-                order: <number>order.values[i],
             });
         }
 
