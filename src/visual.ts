@@ -117,7 +117,7 @@ export class Visual implements IVisual {
             .range([height - this.settings.axis.x.padding, height * 0.2]);
 
         let xScale = d3.scaleBand()
-            .domain(this.viewModel.dataPoints.map(data => data.category).sort())
+            .domain(this.viewModel.dataPoints.map(data => data.category))
             .rangeRound([0, width])
             .padding(this.xPadding);
 
@@ -200,7 +200,7 @@ export class Visual implements IVisual {
                     let formattedDif = difference.toFixed(2);
 
                     if (data[i + 1].value < d.value) {
-                        return `-${formattedDif}%`;
+                        return `${formattedDif}%`;
                     }
 
                     if (data[i + 1].value > d.value) {

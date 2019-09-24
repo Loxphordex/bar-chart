@@ -12,7 +12,10 @@
         {
             "displayName": "Order",
             "name": "order",
-            "kind": "Measure"
+            "kind": "Measure",
+            "requiredTypes": [{
+                "integer": true
+            }]
         }
     ],
     "objects": {},
@@ -24,6 +27,11 @@
             },
             {
                 "measure": {
+                    "max": 1
+                }
+            },
+            {
+                "order": {
                     "max": 1
                 }
             }
@@ -38,22 +46,23 @@
                 }
             },
             "values": {
-                "select": [{
-                    "bind": {
-                        "to": "measure"
-                    }
-                }]
+                "group": {
+                    "by": "order",
+                    "select": [{
+                        "bind": {
+                            "to": "measure"
+                        }
+                    }]
+                }
             }
         }
     }],
     "sorting": {
         "implicit": {
-            "clauses": [
-                {
-                    "role": "order",
-                    "direction": 1
-                }
-            ]
+            "clauses": [{
+                "role": "order",
+                "direction": 1
+            }]
         }
     }
 }
