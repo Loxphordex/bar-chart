@@ -45,6 +45,7 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 interface DataPoint {
     category: string;
     value: number;
+    order: number;
 }
 
 interface ViewModel {
@@ -319,7 +320,8 @@ export class Visual implements IVisual {
         for (let i = 0, len = Math.max(categories.values.length, values.values.length); i < len; i++) {
             viewModel.dataPoints.push({
                 category: <string>categories.values[i],
-                value: <number>values.values[i]
+                value: <number>values.values[i],
+                order: <number>order.values[i],
             });
         }
 

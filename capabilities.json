@@ -8,6 +8,11 @@
             "displayName": "Values",
             "name": "measure",
             "kind": "Measure"
+        },
+        {
+            "displayName": "Order",
+            "name": "order",
+            "kind": "Measure"
         }
     ],
     "objects": {},
@@ -40,5 +45,15 @@
                 }]
             }
         }
-    }]
+    }],
+    "sorting": {
+        "implicit": {
+            "clauses": [
+                {
+                    "role": "order",
+                    "direction": 1
+                }
+            ]
+        }
+    }
 }
