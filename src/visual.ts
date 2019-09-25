@@ -45,6 +45,7 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 interface DataPoint {
     category: string;
     value: number;
+    order?: number;
 }
 
 interface ViewModel {
@@ -160,7 +161,7 @@ export class Visual implements IVisual {
             .append('rect')
             .classed('pbar', true)
             .attr('width', (xScale.bandwidth() / 4) + 20)
-            .attr('height', (d) => 30)
+            .attr('height', (d) => (d.value) ? 30 : 0)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
             .attr('y', (d) => height - this.settings.axis.x.padding - 40)
             .attr('rx', 5)
@@ -175,7 +176,7 @@ export class Visual implements IVisual {
             });
         pBars
             .attr('width', (xScale.bandwidth() / 4) + 20)
-            .attr('height', (d) => 30)
+            .attr('height', (d) => (d.value) ? 30 : 0)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
             .attr('y', (d) => height - this.settings.axis.x.padding - 40);
         pBars.exit().remove();
@@ -189,30 +190,7 @@ export class Visual implements IVisual {
         pLabels.enter()
             .append('text')
             .classed('plabel', true)
-            .text((d, i) => {
-                const data = this.viewModel.dataPoints;
-                if (data[i + 1]) {
-                    let d1 = d.value;
-                    let d2 = data[i + 1].value;
-                    let num = d2 - d1;
-                    let den = Math.abs(d1);
-                    let difference = (num / den) * 100;
-                    let formattedDif = difference.toFixed(2);
-
-                    if (data[i + 1].value < d.value) {
-                        return `${formattedDif}%`;
-                    }
-
-                    if (data[i + 1].value > d.value) {
-                        return `+${formattedDif}%`;
-                    }
-
-                    if (data[i + 1].value === d.value) return '+0.00%';
-
-
-                }
-                return '';
-            })
+            .text((d, i) => this.calcPercentDiff(d, i))
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
             .attr('y', (d) => height - this.settings.axis.x.padding - 20)
             .style('position', 'absolute')
@@ -284,7 +262,7 @@ export class Visual implements IVisual {
                 return dPoint;
             })
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - 23)
+            .attr('y', (d) => (d.value) ? yScale(d.value) - 23 : 0)
             .attr("text-anchor", "middle")
             .style('font-size', '1.05em')
             .style('font-weight', '500')
@@ -317,13 +295,46 @@ export class Visual implements IVisual {
         for (let i = 0, len = Math.max(categories.values.length, values.values.length); i < len; i++) {
             viewModel.dataPoints.push({
                 category: <string>categories.values[i],
-                value: <number>values.values[i],
+                value: <number>values.values[i]
             });
         }
 
         viewModel.maxValue = d3.max(viewModel.dataPoints, d => d.value);
 
         return viewModel;
+    }
+
+    private calcPercentDiff(d: DataPoint, i: number) {
+        if (!d.value) return '';
+        const data = this.viewModel.dataPoints;
+        if (data[i + 1]) {
+            /**
+             * To calculate the difference in percentage
+             * between data points:
+             * Numerator: next data point minus current data point
+             * Denominator: absolute value of current data point
+             * Divide numerator by denominator
+             * Multiply result by 100
+             * Limit the maximum decimal points to 2.
+             */
+            let d1 = d.value;
+            let d2 = data[i + 1].value;
+            let num = d2 - d1;
+            let den = Math.abs(d1);
+            let difference = (num / den) * 100;
+            let formattedDif = difference.toFixed(2);
+
+            if (data[i + 1].value < d.value) {
+                return `${formattedDif}%`;
+            }
+
+            if (data[i + 1].value > d.value) {
+                return `+${formattedDif}%`;
+            }
+
+            if (data[i + 1].value === d.value) return '+0.00%';
+        }
+        return '';
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

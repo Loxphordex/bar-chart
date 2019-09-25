@@ -46,23 +46,12 @@
                 }
             },
             "values": {
-                "group": {
-                    "by": "order",
-                    "select": [{
-                        "bind": {
-                            "to": "measure"
-                        }
-                    }]
-                }
+                "select": [{
+                    "bind": {
+                        "to": "measure"
+                    }
+                }]
             }
         }
-    }],
-    "sorting": {
-        "implicit": {
-            "clauses": [{
-                "role": "order",
-                "direction": 1
-            }]
-        }
-    }
+    }]
 }
