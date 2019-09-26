@@ -22,6 +22,7 @@
     "popper.js": "^1.14.7",
     "powerbi-visuals-api": "^2.6.1",
     "powerbi-visuals-utils-dataviewutils": "^2.2.1",
+    "types.d3": "^0.1.1",
     "webpack": "^4.40.2"
   },
   "devDependencies": {

@@ -101,7 +101,7 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-
+        console.log('updated');
         //
         // ** VIEW SETUP
         //
@@ -204,6 +204,7 @@ export class Visual implements IVisual {
                     : 'none';
             });
         pLabels
+            .text((d, i) => this.calcPercentDiff(d, i))
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
             .attr('y', (d) => height - this.settings.axis.x.padding - 20);
         pLabels.exit().remove();
@@ -218,18 +219,13 @@ export class Visual implements IVisual {
         labels.enter()
             .append('text')
             .classed('v-label', true)
-            .text((d) => {
-                // finds the difference between the initial data value and the current data value
-                // then the difference is converted to a string
-                let max = d3.max(this.viewModel.dataPoints.map(data => data.value));
-                let diffFromMax = ((d.value / max) * 100);
-                return `${Math.round(diffFromMax)}%`;
-            })
+            .text((d) => this.getPercentageLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
             .attr("text-anchor", "middle")
             .style('font-size', '0.9em');
         labels
+            .text((d) => this.getPercentageLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - (height * 0.01))
             .attr("text-anchor", "middle");
@@ -244,23 +240,7 @@ export class Visual implements IVisual {
         dLabels.enter()
             .append('text')
             .classed('d-label', true)
-            .text((d) => {
-                let dPoint = d.value.toFixed();
-
-                // unit assignment
-                if (dPoint.length < 4) return dPoint;
-                if (dPoint.length === 4) return `${dPoint[0]},${dPoint.slice(1)}`;
-                if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}K`;
-                if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}K`;
-                if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}M`;
-                if (dPoint.length === 8) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}M`;
-                if (dPoint.length === 9) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}M`;
-                if (dPoint.length === 10) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}B`;
-                if (dPoint.length === 11) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}B`;
-                if (dPoint.length === 12) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}B`;
-                if (dPoint.length === 13) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}T`;
-                return dPoint;
-            })
+            .text((d) => this.getDataLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => (d.value) ? yScale(d.value) - 23 : 0)
             .attr("text-anchor", "middle")
@@ -268,6 +248,7 @@ export class Visual implements IVisual {
             .style('font-weight', '500')
             .style('fill', 'rgb(57, 123, 180)');
         dLabels
+            .text((d) => this.getDataLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
             .attr('y', (d) => yScale(d.value) - 23)
             .attr("text-anchor", "middle");
@@ -335,6 +316,32 @@ export class Visual implements IVisual {
             if (data[i + 1].value === d.value) return '+0.00%';
         }
         return '';
+    }
+
+    private getDataLabels(d: DataPoint) {
+        let dPoint = d.value.toFixed();
+
+        // unit assignment
+        if (dPoint.length < 4) return dPoint;
+        if (dPoint.length === 4) return `${dPoint[0]},${dPoint.slice(1)}`;
+        if (dPoint.length === 5) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}K`;
+        if (dPoint.length === 6) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}K`;
+        if (dPoint.length === 7) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}M`;
+        if (dPoint.length === 8) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}M`;
+        if (dPoint.length === 9) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}M`;
+        if (dPoint.length === 10) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}B`;
+        if (dPoint.length === 11) return `${dPoint.slice(0, 2)}.${dPoint.slice(2, 3)}B`;
+        if (dPoint.length === 12) return `${dPoint.slice(0, 3)}.${dPoint.slice(3, 4)}B`;
+        if (dPoint.length === 13) return `${dPoint.slice(0, 1)}.${dPoint.slice(1, 2)}T`;
+        return dPoint;
+    }
+
+    private getPercentageLabels(d: DataPoint) {
+        // finds the difference between the initial data value and the current data value
+        // then the difference is converted to a string
+        let max = d3.max(this.viewModel.dataPoints.map(data => data.value));
+        let diffFromMax = ((d.value / max) * 100);
+        return `${Math.round(diffFromMax)}%`;
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
