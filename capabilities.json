@@ -8,6 +8,14 @@
             "displayName": "Values",
             "name": "measure",
             "kind": "Measure"
+        },
+        {
+            "displayName": "Order",
+            "name": "order",
+            "kind": "Measure",
+            "requiredTypes": [{
+                "integer": true
+            }]
         }
     ],
     "objects": {},
@@ -19,6 +27,11 @@
             },
             {
                 "measure": {
+                    "max": 1
+                }
+            },
+            {
+                "order": {
                     "max": 1
                 }
             }
@@ -40,5 +53,8 @@
                 }]
             }
         }
-    }]
+    }],
+    "sorting": {
+        "default": {}
+    }
 }
