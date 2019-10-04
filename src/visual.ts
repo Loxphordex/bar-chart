@@ -142,6 +142,8 @@ export class Visual implements IVisual {
             .attr('height', (d) => height - yScale(d.value))
             .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value) / 2)
+            .attr('rx', 2)
+            .attr('ry', 2)
             .style('fill', 'rgb(81, 112, 133)');
         bars
             .attr('width', xScale.bandwidth())
@@ -163,8 +165,8 @@ export class Visual implements IVisual {
             .attr('height', (d) => (d.value) ? 30 : 0)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
             .attr('y', (d) => (height / 2) - 15)
-            .attr('rx', 5)
-            .attr('ry', 5)
+            .attr('rx', 2)
+            .attr('ry', 2)
             .style('fill', 'rgb(118, 154, 156)')
             .style('position', 'relative')
             .style('display', (d, i) => {
