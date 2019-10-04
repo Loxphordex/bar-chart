@@ -66,7 +66,7 @@ export class Visual implements IVisual {
     private labelGroup: Selection<SVGElement>;
     private dLabelGroup: Selection<SVGElement>;
     private pLabelGroup: Selection<SVGElement>;
-    private xPadding: number = 0.2;
+    private xPadding: number = 0.3;
     private xAxisGroup: Selection<SVGElement>;
     private settings = {
         axis: {
@@ -101,7 +101,6 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-        console.log('updated');
         //
         // ** VIEW SETUP
         //
@@ -126,9 +125,9 @@ export class Visual implements IVisual {
             .scale(xScale)
             .tickSize(1);
 
-        this.xAxisGroup
-            .call(xAxis)
-            .attr('transform', `translate(0, ${height - this.settings.axis.x.padding})`);
+        // this.xAxisGroup
+        //     .call(xAxis)
+        //     .attr('transform', `translate(0, ${height - this.settings.axis.x.padding})`);
 
         //
         // ** BARS
@@ -140,15 +139,15 @@ export class Visual implements IVisual {
             .append('rect')
             .classed('bar', true)
             .attr('width', xScale.bandwidth())
-            .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
+            .attr('height', (d) => height - yScale(d.value))
             .attr('x', (d) => xScale(d.category))
-            .attr('y', (d) => yScale(d.value))
-            .style('fill', 'rgb(57, 123, 180)');
+            .attr('y', (d) => yScale(d.value) / 2)
+            .style('fill', 'rgb(81, 112, 133)');
         bars
             .attr('width', xScale.bandwidth())
-            .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
+            .attr('height', (d) => height - yScale(d.value))
             .attr('x', (d) => xScale(d.category))
-            .attr('y', (d) => yScale(d.value));
+            .attr('y', (d) => yScale(d.value) / 2);
         bars.exit().remove();
 
         //
@@ -160,13 +159,13 @@ export class Visual implements IVisual {
         pBars.enter()
             .append('rect')
             .classed('pbar', true)
-            .attr('width', (xScale.bandwidth() / 4) + 20)
+            .attr('width', (xScale.bandwidth() / 4) + (width / 100))
             .attr('height', (d) => (d.value) ? 30 : 0)
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
-            .attr('y', (d) => height - this.settings.axis.x.padding - 40)
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
+            .attr('y', (d) => (height / 2) - (this.settings.axis.x.padding / 2))
             .attr('rx', 5)
             .attr('ry', 5)
-            .style('fill', 'rgba(220, 0, 0, 0.623)')
+            .style('fill', 'rgb(118, 154, 156)')
             .style('position', 'relative')
             .style('display', (d, i) => {
                 // remove the last percentage bar
@@ -175,39 +174,39 @@ export class Visual implements IVisual {
                     : 'none';
             });
         pBars
-            .attr('width', (xScale.bandwidth() / 4) + 20)
+            .attr('width', (xScale.bandwidth() / 4) + (width / 100))
             .attr('height', (d) => (d.value) ? 30 : 0)
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() - 10)
-            .attr('y', (d) => height - this.settings.axis.x.padding - 40);
+            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
+            .attr('y', (d) => (height / 2) - (this.settings.axis.x.padding / 2));
         pBars.exit().remove();
 
         //
         // ** LABELS - DIFFERENCE IN PERCENTAGE
         //
-        let pLabels = this.pLabelGroup
-            .selectAll('.plabel')
-            .data(this.viewModel.dataPoints);
-        pLabels.enter()
-            .append('text')
-            .classed('plabel', true)
-            .text((d, i) => this.calcPercentDiff(d, i))
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
-            .attr('y', (d) => height - this.settings.axis.x.padding - 20)
-            .style('position', 'absolute')
-            .style('font-size', '0.85em')
-            .style('text-anchor', 'middle')
-            .style('fill', 'white')
-            .style('z-index', 100)
-            .style('display', (d, i) => {
-                return (this.viewModel.dataPoints[i + 1])
-                    ? 'inline-block'
-                    : 'none';
-            });
-        pLabels
-            .text((d, i) => this.calcPercentDiff(d, i))
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
-            .attr('y', (d) => height - this.settings.axis.x.padding - 20);
-        pLabels.exit().remove();
+        // let pLabels = this.pLabelGroup
+        //     .selectAll('.plabel')
+        //     .data(this.viewModel.dataPoints);
+        // pLabels.enter()
+        //     .append('text')
+        //     .classed('plabel', true)
+        //     .text((d, i) => this.calcPercentDiff(d, i))
+        //     .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
+        //     .attr('y', (d) => height - this.settings.axis.x.padding - 20)
+        //     .style('position', 'absolute')
+        //     .style('font-size', '0.85em')
+        //     .style('text-anchor', 'middle')
+        //     .style('fill', 'white')
+        //     .style('z-index', 100)
+        //     .style('display', (d, i) => {
+        //         return (this.viewModel.dataPoints[i + 1])
+        //             ? 'inline-block'
+        //             : 'none';
+        //     });
+        // pLabels
+        //     .text((d, i) => this.calcPercentDiff(d, i))
+        //     .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (xScale.bandwidth() / 8))
+        //     .attr('y', (d) => height - this.settings.axis.x.padding - 20);
+        // pLabels.exit().remove();
 
 
         //
@@ -221,13 +220,13 @@ export class Visual implements IVisual {
             .classed('v-label', true)
             .text((d) => this.getPercentageLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - (height * 0.01))
+            .attr('y', (d) => (yScale(d.value) - (height * 0.015)) / 2)
             .attr("text-anchor", "middle")
             .style('font-size', '0.9em');
         labels
             .text((d) => this.getPercentageLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - (height * 0.01))
+            .attr('y', (d) => (yScale(d.value) - (height * 0.015)) / 2)
             .attr("text-anchor", "middle");
         labels.exit().remove();
 
@@ -242,15 +241,15 @@ export class Visual implements IVisual {
             .classed('d-label', true)
             .text((d) => this.getDataLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => (d.value) ? yScale(d.value) - 23 : 0)
+            .attr('y', (d) => (d.value) ? yScale(d.value) / 2 - 20 : 0)
             .attr("text-anchor", "middle")
             .style('font-size', '1.05em')
             .style('font-weight', '500')
-            .style('fill', 'rgb(57, 123, 180)');
+            .style('fill', 'rgb(81, 112, 133)');
         dLabels
             .text((d) => this.getDataLabels(d))
             .attr('x', (d) => xScale(d.category) + (xScale.bandwidth() / 2))
-            .attr('y', (d) => yScale(d.value) - 23)
+            .attr('y', (d) => (d.value) ? yScale(d.value) / 2 - 20 : 0)
             .attr("text-anchor", "middle");
         dLabels.exit().remove();
     }
