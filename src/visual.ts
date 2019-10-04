@@ -162,7 +162,7 @@ export class Visual implements IVisual {
             .attr('width', (xScale.bandwidth() / 4) + (width / 100))
             .attr('height', (d) => (d.value) ? 30 : 0)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
-            .attr('y', (d) => (height / 2) - (this.settings.axis.x.padding / 2))
+            .attr('y', (d) => (height / 2) - 15)
             .attr('rx', 5)
             .attr('ry', 5)
             .style('fill', 'rgb(118, 154, 156)')
@@ -177,7 +177,7 @@ export class Visual implements IVisual {
             .attr('width', (xScale.bandwidth() / 4) + (width / 100))
             .attr('height', (d) => (d.value) ? 30 : 0)
             .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
-            .attr('y', (d) => (height / 2) - (this.settings.axis.x.padding / 2));
+            .attr('y', (d) => (height / 2) - 15);
         pBars.exit().remove();
 
         //
