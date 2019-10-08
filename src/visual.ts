@@ -38,7 +38,7 @@ import DataView = powerbi.DataView;
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
 import * as d3 from "d3";
 import { VisualSettings } from "./settings";
-import { xml } from "d3";
+import { xml, line } from "d3";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -66,6 +66,7 @@ export class Visual implements IVisual {
     private labelGroup: Selection<SVGElement>;
     private dLabelGroup: Selection<SVGElement>;
     private pLabelGroup: Selection<SVGElement>;
+    private lineGroup: Selection<SVGElement>;
     private xPadding: number = 0.3;
     private xAxisGroup: Selection<SVGElement>;
     private settings = {
@@ -98,6 +99,8 @@ export class Visual implements IVisual {
             .classed('p-label-group', true);
         this.xAxisGroup = this.svg.append('g')
             .classed('x-axis', true);
+        this.lineGroup = this.svg.append('g')
+            .classed('line-group', true);
     }
 
     public update(options: VisualUpdateOptions) {
@@ -155,32 +158,51 @@ export class Visual implements IVisual {
         //
         // ** BARS - PERCENTAGE
         //
-        let pBars = this.pBarGroup
-            .selectAll('.pbar')
-            .data(this.viewModel.dataPoints);
-        pBars.enter()
-            .append('rect')
-            .classed('pbar', true)
-            .attr('width', (xScale.bandwidth() / 4) + (width / 100))
-            .attr('height', (d) => (d.value) ? 30 : 0)
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
-            .attr('y', (d) => (height / 2) - 15)
-            .attr('rx', 2)
-            .attr('ry', 2)
-            .style('fill', 'rgb(118, 154, 156)')
-            .style('position', 'relative')
-            .style('display', (d, i) => {
-                // remove the last percentage bar
-                return (this.viewModel.dataPoints[i + 1])
-                    ? 'block'
-                    : 'none';
+        // let pBars = this.pBarGroup
+        //     .selectAll('.pbar')
+        //     .data(this.viewModel.dataPoints);
+        // pBars.enter()
+        //     .append('rect')
+        //     .classed('pbar', true)
+        //     .attr('width', (xScale.bandwidth() / 4) + (width / 100))
+        //     .attr('height', (d) => (d.value) ? 30 : 0)
+        //     .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
+        //     .attr('y', (d) => (height / 2) - 15)
+        //     .attr('rx', 2)
+        //     .attr('ry', 2)
+        //     .style('fill', 'rgb(118, 154, 156)')
+        //     .style('position', 'relative')
+        //     .style('display', (d, i) => {
+        //         // remove the last percentage bar
+        //         return (this.viewModel.dataPoints[i + 1])
+        //             ? 'block'
+        //             : 'none';
+        //     });
+        // pBars
+        //     .attr('width', (xScale.bandwidth() / 4) + (width / 100))
+        //     .attr('height', (d) => (d.value) ? 30 : 0)
+        //     .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
+        //     .attr('y', (d) => (height / 2) - 15);
+        // pBars.exit().remove();
+
+        let line = d3.line()
+            .x(function(d) {
+                return d[0];
+            })
+            .y(function(d) {
+                return d[1];
             });
-        pBars
-            .attr('width', (xScale.bandwidth() / 4) + (width / 100))
-            .attr('height', (d) => (d.value) ? 30 : 0)
-            .attr('x', (d) => xScale(d.category) + xScale.bandwidth() + (width / 200))
-            .attr('y', (d) => (height / 2) - 15);
-        pBars.exit().remove();
+
+        let lines = this.lineGroup
+            .selectAll('path')
+            .data(this.viewModel.dataPoints)
+            .enter()
+            .append('path')
+            .classed('line', true)
+            .attr('d', (d) => line([[d.value, d.value - 30]]))
+            .style('fill', 'rgb(118, 154, 156)');
+        lines.exit().remove();
+
 
         //
         // ** LABELS - DIFFERENCE IN PERCENTAGE
