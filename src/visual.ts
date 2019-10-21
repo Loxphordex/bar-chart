@@ -113,6 +113,10 @@ export class Visual implements IVisual {
         this.svg.attr('width', width);
         this.svg.attr('height', height);
 
+        // let colorScale = d3.scaleLinear()
+        //     .domain([0, 10])
+        //     .range(['white', 'blue']);
+
         let yScale = d3.scaleLinear()
             .domain([0, this.viewModel.maxValue])
             .range([height - this.settings.axis.x.padding, height * 0.2]);
@@ -143,7 +147,12 @@ export class Visual implements IVisual {
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
             .attr('x', (d) => xScale(d.category))
             .attr('y', (d) => yScale(d.value))
-            .style('fill', 'rgb(57, 123, 180)');
+            .style('fill', (d) => {
+                let max = d3.max(this.viewModel.dataPoints.map(data => data.value));
+                let diffFromMax = ((d.value / max) * 100);
+                return `rgb(240, ${diffFromMax}, 17)`;
+            }
+            );
         bars
             .attr('width', xScale.bandwidth())
             .attr('height', (d) => height - yScale(d.value) - this.settings.axis.x.padding)
