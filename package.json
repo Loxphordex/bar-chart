@@ -23,10 +23,10 @@
     "powerbi-visuals-api": "^2.6.1",
     "powerbi-visuals-utils-dataviewutils": "^2.2.1",
     "types.d3": "^0.1.1",
-    "webpack": "^4.40.2"
+    "webpack": "^5.75.0"
   },
   "devDependencies": {
-    "ts-loader": "6.0.4",
+    "ts-loader": "9.4.2",
     "typescript": "3.5.3"
   }
 }
